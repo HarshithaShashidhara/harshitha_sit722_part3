@@ -1,0 +1,110 @@
+# Define the Deployment for the book catalog service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Name of the Deployment
+  name: book-catalog-deployment
+spec:
+  # Number of pod replicas to run
+  replicas: 1
+  # Selector for matching pods with the app label 'book-catalog'
+  selector:
+    matchLabels:
+      app: book-catalog
+  template:
+    metadata:
+      # Label to apply to the pods created by this Deployment
+      labels:
+        app: book-catalog
+    spec:
+      # Container specification for the book catalog app
+      containers: 
+      - name: book-catalog
+        # Image to be pulled from the Azure Container Registry (ACR)
+        image: part3sit722container.azurecr.io/book_catalog_az:latest 
+        # Pull the image only if it is not already present
+        imagePullPolicy: IfNotPresent
+        # Expose port 5000 within the container
+        ports:
+        - containerPort: 5000
+        # Set environment variables for the container
+        env:
+        - name: PORT
+          value: "5000"
+        - name: DATABASE_URL
+          # PostgreSQL connection string for the database
+          value: postgresql://db_7_2p_goum_user:hRLH4HXDeG5FYUgY3WiZYuKE4pMd4b28@dpg-crek6aogph6c73essj0g-a.oregon-postgres.render.com/db_7_2p_goum
+---
+# Define the Service for the book catalog service
+apiVersion: v1
+kind: Service
+metadata:
+  # Name of the service
+  name: book-catalog-service
+spec:
+  # Selector to link this Service to the book-catalog pods
+  selector:
+    app: book-catalog
+  # Type LoadBalancer makes the service externally accessible (in cloud environments)
+  type: LoadBalancer
+  ports:
+    # Expose port 4002 externally and map it to port 5000 in the container
+    - port: 4002
+      targetPort: 5000
+
+---
+
+# Define the Deployment for the inventory management service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Name of the Deployment
+  name: inventory-management-deployment
+spec:
+  # Number of pod replicas to run
+  replicas: 1
+  # Selector for matching pods with the app label 'inventory-management'
+  selector:
+    matchLabels:
+      app: inventory-management
+  template:
+    metadata:
+      # Label to apply to the pods created by this Deployment
+      labels:
+        app: inventory-management
+    spec:
+      # Container specification for the inventory management app
+      containers: 
+      - name: inventory-management
+        # Image to be pulled from Azure Container Registry (ACR)
+        image: part3sit722container.azurecr.io/inventory_management_az:latest
+        # Pull the image only if it is not already present
+        imagePullPolicy: IfNotPresent
+        # Expose port 5001 within the container
+        ports:
+        - containerPort: 5001
+        # Set environment variables for the container
+        env:
+        - name: PORT
+          value: "5001"
+        - name: DATABASE_URL
+          # PostgreSQL connection string for the database
+          value: postgresql://db_7_2p_goum_user:hRLH4HXDeG5FYUgY3WiZYuKE4pMd4b28@dpg-crek6aogph6c73essj0g-a.oregon-postgres.render.com/db_7_2p_goum
+---
+
+# Define the Service for the inventory management service
+apiVersion: v1
+kind: Service
+metadata:
+  # Name of the service
+  name: inventory-management-service
+spec:
+  # Selector to link this Service to the inventory-management pods
+  selector:
+    app: inventory-management
+  # Type LoadBalancer makes the service externally accessible (in cloud environments)
+  type: LoadBalancer
+  ports:
+    # Expose port 4003 externally and map it to port 5001 in the container
+    - port: 4003
+      targetPort: 5001

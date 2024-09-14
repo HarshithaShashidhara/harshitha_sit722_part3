@@ -1,0 +1,57 @@
+# Define the version of the Docker Compose file format
+version: '3'
+
+services:
+  # Define the service for the book catalog microservice
+  book_catalog:
+    # The image name for the book catalog service, which will be built using the provided Dockerfile
+    image: book_catalog:latest
+    # Build configuration for the book catalog service
+    build: 
+      # Specify the directory containing the Dockerfile for this service
+      context: ./book_catalog
+      # The Dockerfile to use for building this service
+      dockerfile: Dockerfile
+      # Pass build arguments if needed (e.g., NO_CACHE for forcing rebuilds)
+      args:
+        - NO_CACHE=true
+    # Name the container for easier identification during `docker ps` or `docker logs`
+    container_name: book_catalog_cntr
+    # Map port 4002 on the host to port 5000 in the container (the application listens on 5000)
+    ports:
+     - "4002:5000"
+    # Set environment variables for the service
+    environment:
+      # Define the port that the application will use inside the container
+      - PORT=5000
+      # Set the database connection URL for the PostgreSQL instance
+      - DATABASE_URL=postgresql://db_7_2p_goum_user:hRLH4HXDeG5FYUgY3WiZYuKE4pMd4b28@dpg-crek6aogph6c73essj0g-a.oregon-postgres.render.com/db_7_2p_goum
+    # Do not automatically restart the container if it stops
+    restart: "no"
+
+  # Define the service for the inventory management microservice
+  inventory_management:
+    # The image name for the inventory management service, which will be built using the provided Dockerfile
+    image: inventory_management:latest
+    # Build configuration for the inventory management service
+    build: 
+      # Specify the directory containing the Dockerfile for this service
+      context: ./inventory_management
+      # The Dockerfile to use for building this service
+      dockerfile: Dockerfile
+      # Pass build arguments if needed (e.g., NO_CACHE for forcing rebuilds)
+      args:
+        - NO_CACHE=true
+    # Name the container for easier identification
+    container_name: inventory_management_cntr
+    # Map port 4003 on the host to port 5001 in the container (the application listens on 5001)
+    ports:
+     - "4003:5001"
+    # Set environment variables for the service
+    environment:
+      # Define the port that the application will use inside the container
+      - PORT=5001
+      # Set the database connection URL for the PostgreSQL instance
+      - DATABASE_URL=postgresql://db_7_2p_goum_user:hRLH4HXDeG5FYUgY3WiZYuKE4pMd4b28@dpg-crek6aogph6c73essj0g-a.oregon-postgres.render.com/db_7_2p_goum
+    # Do not automatically restart the container if it stops
+    restart: "no"
